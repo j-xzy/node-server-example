@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
 </head>
+
 <body>
-  <button id='fetchBtn'>asdsadasd</button>
-  <script>
-    fetchBtn.onclick = ()=> {
-      fetch('/fo',{
-      method:'post',
-      body: '123'
-    })
-    }
-  </script>
+  <form action='/login' method='post'>
+    <p>名称: <input type="text" name="username" /></p>
+    <p>密码: <input type="text" name="password" /></p>
+    <input type="submit" value="Submit" />
+  </form>
 </body>
+
 </html>
