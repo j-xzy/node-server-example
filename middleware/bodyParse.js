@@ -7,6 +7,7 @@ module.exports = function bodyParser() {
     return new Promise((resolve) => {
       // 不解析Get
       if (req.method === 'GET') {
+        resolve();
         return;
       }
 

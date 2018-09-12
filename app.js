@@ -1,21 +1,15 @@
 const http = require('http');
 const config = require('./config');
-const serve = require('./middleware/serve')(config.static);
-const bodyParser = require('./middleware/bodyParse')();
+const Oka = require('./oka');
+const serve = require('./middleware/serve');
+const bodyParser = require('./middleware/bodyParse');
 
-// 创建服务
-const server = http.createServer(async (req, res) => {
-  // 静态资源
-  serve(req, res);
+const oka = new Oka();
 
-  // 解析body
-  await bodyParser(req, res);
-
-  
-
+oka.use(serve(config.static));
+oka.use(bodyParser());
+oka.use((req, res) => {
+  req
 });
 
-// 启动监听
-server.listen(config.port, () => {
-  console.log(`listen on ${config.port}`);
-});
+oka.listen(3000);
