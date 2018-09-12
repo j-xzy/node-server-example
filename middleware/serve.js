@@ -11,7 +11,7 @@ const path = require('path');
  */
 module.exports = function serve(root) {
   return (req, res) => {
-    if (req.method !== 'GET') {
+    if (req.method !== 'GET' || req.url === '/robots.txt') {
       return;
     }
     const assetsPath = path.join(root, req.url);
