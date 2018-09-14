@@ -2,6 +2,7 @@ const config = require('./config');
 const Oka = require('./oka');
 const serve = require('./middleware/serve');
 const bodyParser = require('./middleware/bodyParse');
+const fs = require('fs');
 
 const oka = new Oka();
 const database = {
@@ -9,41 +10,42 @@ const database = {
 };
 
 // 静态资源服务
-oka.use(serve(config.static));
+oka.get('/static/*', serve(config.static));
 
 // 解析body
 oka.use(bodyParser());
 
-// 重新定向
+// 重定向
 oka.get('/', (req, res) => {
   if (req.cookie.username) {
-    res.redirect('/home.html');
+    res.redirect('/backend');
   } else {
-    res.redirect('/signup.html');
+    res.redirect('/signup');
   }
-  res.end();
 });
 
-// home
-oka.get('/home.html', (req, res) => {
+// backend
+oka.get('/backend', (req, res) => {
   if (!req.cookie.username) {
-    res.end('没有权限');
+    res.redirect('/signup');
+  } else {
+    fs.createReadStream('./static/backend.html').pipe(res);
   }
 });
 
-// 登录
-oka.post('/login', (req, res) => {
-  debugger
+oka.get('/signup', (req, res) => {
+  if (!req.cookie.username) {
+    fs.createReadStream('./static/signup.html').pipe(res);
+  } else {
+    res.redirect('/backend');
+  }
 });
 
 // 注册
 oka.post('/register', (req, res) => {
   database.user.push({ ...req.body });
-  res.setHeader('Set-Cookie', [`username= ${req.body.username}`]);
-  res.redirect('/home.html');
-  res.end();
+  res.setHeader('Set-Cookie', [`username=${req.body.username}`]);
+  res.redirect('/backend');
 });
-
-
 
 oka.listen(config.port);

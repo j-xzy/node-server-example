@@ -11,7 +11,7 @@ const path = require('path');
  */
 module.exports = function serve(root) {
   return (req, res) => {
-    if (req.method !== 'GET' || req.url === '/robots.txt') {
+    if (res.finished) {
       return;
     }
     const assetsPath = path.join(root, req.url);
@@ -38,7 +38,7 @@ module.exports = function serve(root) {
 
       // 资源未更改,浏览器已缓存
       res.statusCode = '304';
-      res.end();
+      res.write();
     });
   }
 }
