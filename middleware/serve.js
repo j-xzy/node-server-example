@@ -14,8 +14,8 @@ module.exports = function serve(root, opt) {
     if (res.finished || req.method !== 'GET') {
       return next();
     }
-    let base = path.parse(req.url).base;
-    base === '' && (base = opt.index);
+    let base = req.url;
+    base === '/' && (base = opt.index);
 
     const assetsPath = path.join(root, base);
     fs.stat(assetsPath, (err, stats) => {

@@ -30,10 +30,10 @@ oka.use(serve(config.static, { index: 'index.html' }));
 // 解析body
 oka.use(bodyParser());
 
-// 
+// 登录
 oka.post('/signin', (req, res) => {
   if (!req.cookie.username) {
-    // fs.createReadStream('./static/signup.html').pipe(res);
+    fs.createReadStream('./static/sign.html').pipe(res);
   } else {
     res.redirect('/');
   }
