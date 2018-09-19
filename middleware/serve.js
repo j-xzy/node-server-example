@@ -9,18 +9,21 @@ const path = require('path');
  * 静态资源
  * @param {string} root 
  */
-module.exports = function serve(root) {
-  return (req, res) => {
-    if (res.finished) {
-      return;
+module.exports = function serve(root, opt) {
+  return (req, res, next) => {
+    if (res.finished || req.method !== 'GET') {
+      return next();
     }
-    const assetsPath = path.join(root, req.url);
+    let base = path.parse(req.url).base;
+    base === '' && (base = opt.index);
+
+    const assetsPath = path.join(root, base);
     fs.stat(assetsPath, (err, stats) => {
       if (err) {
-        return;
+        return next();
       }
       if (stats.isDirectory()) {
-        return;
+        return next();
       }
 
       // 设置header
@@ -32,13 +35,12 @@ module.exports = function serve(root) {
       if (req.headers["if-none-match"] !== getEtag(stats)) {
         // 资源已被更改
         res.statusCode = '200';
-        fs.createReadStream(assetsPath).pipe(res);
-        return;
+        return res.end(fs.readFileSync(assetsPath));
       }
 
       // 资源未更改,浏览器已缓存
       res.statusCode = '304';
-      res.write();
+      return res.end();
     });
   }
 }

@@ -6,7 +6,7 @@ class Oka {
     this.middlewares = [this.firstMiddleware];
   }
 
-  firstMiddleware(req, res) {
+  firstMiddleware(req, res, next) {
     // 挂载重定向
     res.redirect = (url) => {
       res.statusCode = '302';
@@ -21,20 +21,26 @@ class Oka {
         req.cookie[item.split('=')[0].trim()] = item.split('=')[1];
       });
     }
+
+    next();
   }
 
   get(url, middleware) {
-    this.use(url, (req, res) => {
+    this.use(url, (req, res, next) => {
       if (req.method === 'GET') {
-        middleware(req, res);
+        middleware(req, res, next);
+      } else {
+        next();
       }
     });
   }
 
   post(url, middleware) {
-    this.use(url, (req, res) => {
+    this.use(url, (req, res, next) => {
       if (req.method === 'POST') {
-        middleware(req, res);
+        middleware(req, res, next);
+      } else {
+        next();
       }
     });
   }
@@ -44,7 +50,7 @@ class Oka {
       middleware = url;
       this.middlewares.push(middleware);
     } else {
-      this.middlewares.push((req, res) => {
+      this.middlewares.push((req, res, next) => {
         if (url.includes('*')) {
           let flag = true;
 
@@ -61,30 +67,33 @@ class Oka {
           }
 
           if (flag) {
-            middleware(req, res);
+            return middleware(req, res, next);
           }
-
-          return;
+          return next();
         }
 
         if (url === req.url) {
-          return middleware(req, res);
+          return middleware(req, res, next);
+        } else {
+          return next();
         }
       });
     }
   }
 
   callback() {
-    this.middlewares.push((req,res) => {
-      if(!res.finished) {
-        
-      }
-    });
     const middlewares = this.middlewares;
-    return async function handleRequest(req, res) {
-      for (let i = 0; i < middlewares.length; i++) {
-        await middlewares[i](req, res)
+
+    return function handleRequest(req, res) {
+      dispath(0);
+
+      function dispath(i) {
+        if (i === middlewares.length) {
+          return;
+        }
+        middlewares[i](req, res, dispath.bind(null, i + 1));
       }
+
     }
   }
 

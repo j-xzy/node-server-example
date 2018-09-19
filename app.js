@@ -9,35 +9,33 @@ const database = {
   user: []
 };
 
-// 静态资源服务
-oka.get('/static/*', serve(config.static));
+oka.use('/', (req, res, next) => {
+  if (!req.cookie.username) {
+    res.end(fs.readFileSync('./static/sign.html'));
+  } else {
+    next();
+  }
+});
+
+oka.use('/index.html', (req, res) => {
+  res.end('404');
+});
+
+oka.use('/sign.html', (req, res) => {
+  res.end('404');
+});
+
+oka.use(serve(config.static, { index: 'index.html' }));
 
 // 解析body
 oka.use(bodyParser());
 
-// 重定向
-oka.get('/', (req, res) => {
-  if (req.cookie.username) {
-    res.redirect('/backend');
-  } else {
-    res.redirect('/signup');
-  }
-});
-
-// backend
-oka.get('/backend', (req, res) => {
+// 
+oka.post('/signin', (req, res) => {
   if (!req.cookie.username) {
-    res.redirect('/signup');
+    // fs.createReadStream('./static/signup.html').pipe(res);
   } else {
-    fs.createReadStream('./static/backend.html').pipe(res);
-  }
-});
-
-oka.get('/signup', (req, res) => {
-  if (!req.cookie.username) {
-    fs.createReadStream('./static/signup.html').pipe(res);
-  } else {
-    res.redirect('/backend');
+    res.redirect('/');
   }
 });
 
@@ -45,7 +43,14 @@ oka.get('/signup', (req, res) => {
 oka.post('/register', (req, res) => {
   database.user.push({ ...req.body });
   res.setHeader('Set-Cookie', [`username=${req.body.username}`]);
-  res.redirect('/backend');
+  res.redirect('/');
+});
+
+// 404
+oka.use((req, res) => {
+  if(!req.finished) {
+    res.end('404');
+  }
 });
 
 oka.listen(config.port);
