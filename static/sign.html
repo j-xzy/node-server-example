@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang='en'>
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta charset='UTF-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <meta http-equiv='X-UA-Compatible' content='ie=edge'>
   <title>登录注册</title>
-  <script src="./script.js"></script>
   <style>
     body{
       display: flex;
@@ -17,28 +16,78 @@
 <body>
   <div class='login'>
     登录
-    <form action='signin' method='post'>
-      <div>
-        用户名 <input type='text' name='username'>
-      </div>
-      <div>
-        密码<input type='password' name='password'>
-      </div>
-      <input type='submit'>
-    </form>
+    <div>
+      用户名 <input id='loginusername' type='text'>
+    </div>
+    <div>
+      密码<input id='loginpassword' type='password'>
+    </div>
+    <button id='login'>登录</button>
   </div>
+
   <div class='register'>
     注册
-    <form action='register' method='post'>
-      <div>
-        用户名 <input type='text' name='username'>
-      </div>
-      <div>
-        密码<input type='password' name='password'>
-      </div>
-      <input type='submit'>
-    </form>
+    <div>
+      用户名 <input id='registerusername' type='text'>
+    </div>
+    <div>
+      密码<input id='registerpassword' type='password'>
+    </div>
+    <button id='register'>注册</button>
   </div>
+  <script>
+    // 登录
+    login.addEventListener('click', () => {
+      fetch('/login', {
+        body: JSON.stringify({
+          username: loginusername.value,
+          password: loginpassword.value
+        }),
+        headers: {
+          'Content-Type': 'application/json;'
+        },
+        method: 'POST',
+        credentials: 'include'
+      }).then((res) => {
+        return res.json();
+      }).then((data) => {
+        if (data.code === 0) {
+          // 登录失败
+          alert(data.msg);
+        }
+        if (data.code === 1) {
+          // 登录成功
+          window.location.href = '/';
+        }
+      });
+    });
+
+    // 注册
+    register.addEventListener('click', () => {
+      fetch('/register', {
+        body: JSON.stringify({
+          username: registerusername.value,
+          password: registerpassword.value
+        }),
+        headers: {
+          'Content-Type': 'application/json;'
+        },
+        method: 'POST',
+        credentials: 'include'
+      }).then((res) => {
+        return res.json();
+      }).then((data) => {
+        if (data.code === 0) {
+          // 注册失败
+          return alert(data.msg);
+        }
+        if (data.code === 1) {
+          // 注册成功、跳转
+          window.location.href = '/';
+        }
+      });
+    });
+  </script>
 </body>
 
 </html>

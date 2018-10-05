@@ -18,7 +18,7 @@ module.exports = function bodyParser() {
     req.on('end', () => {
       const buffer = Buffer.concat(data);
 
-      // son
+      // json
       if (req.headers['content-type'].includes('application/json')) {
         req.body = JSON.parse(buffer);
       }

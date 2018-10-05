@@ -14,8 +14,15 @@ module.exports = function serve(root, opt) {
     if (res.finished || req.method !== 'GET') {
       return next();
     }
+
+    let idx = '/';
+
+    if(opt && opt.index) {
+      idx = opt.index
+    }
+
     let base = req.url;
-    base === '/' && (base = opt.index);
+    base === '/' && (base = idx);
 
     const assetsPath = path.join(root, base);
     fs.stat(assetsPath, (err, stats) => {

@@ -1,6 +1,5 @@
 const http = require('http');
 
-
 class Oka {
   constructor() {
     this.middlewares = [this.firstMiddleware];
@@ -12,6 +11,11 @@ class Oka {
       res.statusCode = '302';
       res.setHeader('Location', url);
       res.end();
+    }
+
+    res.json = function (data) {
+      // res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(data));
     }
 
     // 解析cookie
