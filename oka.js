@@ -13,9 +13,16 @@ class Oka {
       res.end();
     }
 
+    // 发送json
     res.json = function (data) {
-      // res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.setHeader('Content-Type', 'application/json');
+      res.statusCode = 200;
       res.end(JSON.stringify(data));
+    }
+
+    res.noFound = function () {
+      res.statusCode = 404;
+      res.end('404');
     }
 
     // 解析cookie
@@ -55,22 +62,11 @@ class Oka {
       this.middlewares.push(middleware);
     } else {
       this.middlewares.push((req, res, next) => {
-        if (url.includes('*')) {
-          let flag = true;
-
-          let urls = url.slice(0, url.indexOf('*') - 1).split('/');
-          urls.shift();
-
-          let orginUrls = req.url.split('/');
-          orginUrls.shift();
-
-          for (let i = 0; i < urls.length; i++) {
-            if (urls[i] !== orginUrls[i]) {
-              flag = false;
-            }
-          }
-
-          if (flag) {
+        if (
+          url.lastIndexOf('/*') !== -1
+          && url.lastIndexOf('/*') === url.length - 2
+        ) {
+          if (req.url.indexOf(url.slice(0, url.lastIndexOf('/*'))) === 0) {
             return middleware(req, res, next);
           }
           return next();

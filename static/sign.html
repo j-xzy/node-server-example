@@ -5,17 +5,28 @@
   <meta charset='UTF-8'>
   <meta name='viewport' content='width=device-width, initial-scale=1.0'>
   <meta http-equiv='X-UA-Compatible' content='ie=edge'>
+  <script src='./foo.js'></script>
   <title>登录注册</title>
   <style>
     body{
       display: flex;
+    }
+
+    .login, .register {
+      padding: 30px;
+      border: 1px solid #000;
+      margin: 20px;
+    }
+
+    .title {
+      text-align: center;
     }
   </style>
 </head>
 
 <body>
   <div class='login'>
-    登录
+    <h3 class='title'>登录</h3>
     <div>
       用户名 <input id='loginusername' type='text'>
     </div>
@@ -26,7 +37,7 @@
   </div>
 
   <div class='register'>
-    注册
+      <h3 class='title'>注册</h3>
     <div>
       用户名 <input id='registerusername' type='text'>
     </div>
@@ -36,12 +47,42 @@
     <button id='register'>注册</button>
   </div>
   <script>
+    // 绑定登录事件
+    document.getElementById('login').addEventListener('click', login);
+
+    // 绑定注册事件
+    document.getElementById('register').addEventListener('click', register);
+
+    // 注册回车确定
+    document.getElementById('registerpassword').addEventListener('keydown', (e) => {
+      if (e.code === 'Enter') {
+        register();
+      }
+    });
+
+    // 登录回车确定
+    document.getElementById('loginpassword').addEventListener('keydown', (e) => {
+      if (e.code === 'Enter') {
+        login();
+      }
+    });
+
+    // 注册
+    function register() {
+      request('/register', registerusername.value, registerpassword.value);
+    }
+
     // 登录
-    login.addEventListener('click', () => {
-      fetch('/login', {
+    function login() {
+      request('/login', loginusername.value, loginpassword.value);
+    }
+
+    // 请求
+    function request(url, username, password) {
+      fetch(url, {
         body: JSON.stringify({
-          username: loginusername.value,
-          password: loginpassword.value
+          username: username,
+          password: password
         }),
         headers: {
           'Content-Type': 'application/json;'
@@ -60,33 +101,8 @@
           window.location.href = '/';
         }
       });
-    });
+    }
 
-    // 注册
-    register.addEventListener('click', () => {
-      fetch('/register', {
-        body: JSON.stringify({
-          username: registerusername.value,
-          password: registerpassword.value
-        }),
-        headers: {
-          'Content-Type': 'application/json;'
-        },
-        method: 'POST',
-        credentials: 'include'
-      }).then((res) => {
-        return res.json();
-      }).then((data) => {
-        if (data.code === 0) {
-          // 注册失败
-          return alert(data.msg);
-        }
-        if (data.code === 1) {
-          // 注册成功、跳转
-          window.location.href = '/';
-        }
-      });
-    });
   </script>
 </body>
 

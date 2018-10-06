@@ -1,11 +1,12 @@
 /**
  * 解析请求的body
+ * 支持json、字符串、表单
  */
 
 module.exports = function bodyParser() {
   return (req, res, next) => {
-    // 不解析Get
-    if (req.method === 'GET') {
+    // 不解析Get、OPTIONS
+    if (req.method === 'GET' || req.method === 'OPTIONS') {
       return next();
     }
 

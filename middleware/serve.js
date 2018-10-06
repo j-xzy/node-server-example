@@ -9,22 +9,13 @@ const path = require('path');
  * 静态资源
  * @param {string} root 
  */
-module.exports = function serve(root, opt) {
+module.exports = function serve(root) {
   return (req, res, next) => {
     if (res.finished || req.method !== 'GET') {
       return next();
     }
 
-    let idx = '/';
-
-    if(opt && opt.index) {
-      idx = opt.index
-    }
-
-    let base = req.url;
-    base === '/' && (base = idx);
-
-    const assetsPath = path.join(root, base);
+    const assetsPath = path.join(root, req.url);
     fs.stat(assetsPath, (err, stats) => {
       if (err) {
         return next();
