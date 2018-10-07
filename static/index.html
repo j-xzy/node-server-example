@@ -1,20 +1,88 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang='en'>
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta charset='UTF-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
   <title>后台</title>
   <style>
-    body{
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .store,.mycom {
       display: flex;
+      border: 1px solid #000;
+      margin: 5px 0;
+      padding: 5px;
+    }
+
+    .com {
+      border: 1px solid #000;
+    }
+
+    .upload {
+      border: 1px solid #000;
     }
   </style>
 </head>
 
 <body>
-  后台
+  <div>
+    <label>用户名称:</label>
+    <label id='username'></label>
+  </div>
+  <div>
+    <label>角色:</label>
+    <label id='role'></label>
+  </div>
+
+  <h3>组件市场</h3>
+  <div class='store'>
+    <div class='com'>
+      <div class='info'>这是个这是个组件</div>
+      <div>
+        <label>作者:</label>
+        <label>whj</label>
+      </div>
+      <button id='downloadBtn'>下载</button>
+    </div>
+  </div>
+
+  <h3>我的组件</h3>
+  <div class='mycom'>
+    <div class='com'>
+      <div class='info'>这是个这是个组件</div>
+      <button>删除</button>
+    </div>
+  </div>
+
+  <h3>上传组件</h3>
+  <div class='upload'>
+    <div>输入组件信息:</div>
+    <textarea id='textarea' cols='20' rows='5'></textarea>
+    <div>
+      公开<input type='checkbox' />
+    </div>
+    <button id='uploadBtn'>上传</button>
+  </div>
+
+  <h3>管理员</h3>
+  <div class='admin'>
+    <ul>
+      <li>
+        whj
+        <select>
+          <option>游客</option>
+          <option>项目经理</option>
+          <option>程序员</option>
+        </select>
+      </li>
+    </ul>
+    <button>确认</button>
+  </div>
+  <script src='./script.js'></script>
 </body>
 
 </html>

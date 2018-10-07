@@ -23,11 +23,6 @@ connection.connect();
 // 创建oka实例
 const oka = new Oka();
 
-// 临时数据库
-const database = {
-  user: new Map()
-};
-
 // 解析body
 oka.use(bodyParser());
 
