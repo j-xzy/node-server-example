@@ -1,5 +1,17 @@
 username.textContent = getCookie('username');
 
+fetch('/info', {
+  method: 'GET',
+  credentials: 'include'
+}).then((raw) => {
+  return raw.json();
+}).then((json) => {
+  if (json.code === 0) {
+    alert(json.msg);
+  }
+  console.log(json.data);
+});
+
 function getCookie(key) {
   let cookie = document.cookie.split(';');
   for (let i = 0; i < cookie.length; i++) {
@@ -8,3 +20,13 @@ function getCookie(key) {
     }
   }
 }
+
+// var a = {
+//   code: 0,
+//   msg: '',
+//   data: {
+//     username: '',
+//     role: '',
+//     menu: []
+//   }
+// }

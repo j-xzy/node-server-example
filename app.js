@@ -88,6 +88,11 @@ oka.post('/register', async (req, res) => {
   });
 });
 
+oka.get('/info', async (req, res) => {
+  connection.query('')
+  req.cookie
+});
+
 // 404
 oka.use((req, res) => {
   if (!req.finished) {

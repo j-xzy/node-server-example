@@ -1,0 +1,6 @@
+SELECT * FROM 
+(
+  SELECT `user`.`id` as userid,`user`.`username`,`user_has_role`.`roleid`
+  FROM user,user_has_role 
+  WHERE `username` = 'admin' AND userid = `user_has_role`.`userid`
+) as A, role_has_privilege WHERE A.`roleid` = role_has_privilege.roleid
