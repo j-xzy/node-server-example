@@ -12,7 +12,7 @@ const connection = mysql.createConnection({
   port: 3306,
   user: 'root',
   password: 'WOSHI3521',
-  database: 'node-server-example'
+  database: 'node_server_example'
 });
 
 const query = new Query(connection);
