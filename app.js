@@ -79,7 +79,7 @@ oka.post('/register', async (req, res) => {
   }
 
   // 新注册用户
-  await query.addUser(req.body.username, req.body.password);
+  await query.addUser(req.body.username, req.body.password, req.body.role);
   res.setHeader('Set-Cookie', [`username=${req.body.username}`]);
   res.json({
     code: 1,
@@ -89,8 +89,8 @@ oka.post('/register', async (req, res) => {
 });
 
 oka.get('/info', async (req, res) => {
-  connection.query('')
-  req.cookie
+  // connection.query('')
+  // req.cookie
 });
 
 // 404

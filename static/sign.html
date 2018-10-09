@@ -37,12 +37,20 @@
   </div>
 
   <div class='register'>
-      <h3 class='title'>注册</h3>
+    <h3 class='title'>注册</h3>
     <div>
       用户名 <input id='registerusername' type='text'>
     </div>
     <div>
       密码<input id='registerpassword' type='password'>
+    </div>
+    <div>
+      选择角色:
+      <select id='roleSelect'>
+        <option value='programmer'>程序员</option>
+        <option value='pm'>项目经理</option>
+        <option value='visitor'>游客</option>
+      </select>
     </div>
     <button id='register'>注册</button>
   </div>
@@ -69,20 +77,21 @@
 
     // 注册
     function register() {
-      request('/register', registerusername.value, registerpassword.value);
+      request('/register', registerusername.value, registerpassword.value, roleSelect.value);
     }
 
     // 登录
     function login() {
-      request('/login', loginusername.value, loginpassword.value);
+      request('/login', loginusername.value, loginpassword.value, roleSelect.value);
     }
 
     // 请求
-    function request(url, username, password) {
+    function request(url, username, password, role) {
       fetch(url, {
         body: JSON.stringify({
-          username: username,
-          password: password
+          username,
+          password,
+          role
         }),
         headers: {
           'Content-Type': 'application/json;'

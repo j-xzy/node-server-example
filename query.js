@@ -1,6 +1,11 @@
 class Query {
   constructor(connection) {
     this.connection = connection;
+    this.roleMapId = {
+      programmer: 1,
+      pm: 2,
+      visitor: 3
+    };
   }
 
   // 用户是否存在
@@ -14,11 +19,14 @@ class Query {
   }
 
   // 新增用户
-  addUser(username, password) {
+  addUser(username, password, role) {
     return new Promise((resolve) => {
       this.connection.query(`INSERT INTO\`node_server_example\`.\`user\`(\`username\`, \`password\`) VALUES('${username}', '${password}')`,
-        function () {
-          resolve();
+        () => {
+          this.connection.query(`INSERT INTO\`node_server_example\`.\`user_has_role\`(\`user_id\`, \`role_id\`) VALUES(LAST_INSERT_ID(), ${this.roleMapId[role]})`,
+            () => {
+              resolve();
+            });
         });
     });
   }
