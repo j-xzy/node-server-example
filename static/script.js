@@ -1,4 +1,4 @@
-function setPersonInfo(username, role) {
+function renderPersonInfo(username, role) {
   document.getElementById('username').textContent = username;
   document.getElementById('role').textContent = role;
 }
@@ -43,7 +43,7 @@ fetch('/info', {
     return alert(json.msg);
   }
   const data = json.data;
-  setPersonInfo(data.username, data.role.join(''));
+  renderPersonInfo(data.username, data.role.join(''));
   render(data.privilege);
 });
 
