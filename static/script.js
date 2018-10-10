@@ -1,4 +1,37 @@
-username.textContent = getCookie('username');
+function setPersonInfo(username, role) {
+  document.getElementById('username').textContent = username;
+  document.getElementById('role').textContent = role;
+}
+
+function render(privilege) {
+
+}
+
+function compTemplate(isDownload, author, comp) {
+  return
+  `<div class='com'>
+    <div class='info'>${comp}</div>
+      <div>
+        <label>作者:</label>
+        <label>${author}</label>
+      </div>
+     ${isDownload && "<button id='downloadBtn'>下载</button>"}
+  </div>`;
+}
+
+function myCompTemplate(comp) {
+  return
+  `<div class='com'>
+     <div class='info'>${comp}</div>
+     <button>删除</button>
+   </div>`;
+}
+
+function adminTemplate(users) {
+  return 
+  `
+  `
+}
 
 fetch('/info', {
   method: 'GET',
@@ -7,9 +40,11 @@ fetch('/info', {
   return raw.json();
 }).then((json) => {
   if (json.code === 0) {
-    alert(json.msg);
+    return alert(json.msg);
   }
-  console.log(json.data);
+  const data = json.data;
+  setPersonInfo(data.username, data.role.join(''));
+  render(data.privilege);
 });
 
 function getCookie(key) {
@@ -20,13 +55,3 @@ function getCookie(key) {
     }
   }
 }
-
-// var a = {
-//   code: 0,
-//   msg: '',
-//   data: {
-//     username: '',
-//     role: '',
-//     menu: []
-//   }
-// }

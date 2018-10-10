@@ -89,8 +89,24 @@ oka.post('/register', async (req, res) => {
 });
 
 oka.get('/info', async (req, res) => {
-  // connection.query('')
-  // req.cookie
+  if (!req.cookie.username) {
+    return res.json({
+      code: 0,
+      msg: '未登录',
+      data: {}
+    })
+  }
+  const privilege = await query.privilege(req.cookie.username);
+  const role = await query.role(req.cookie.username);
+  res.json({
+    code: 1,
+    msg: '成功',
+    data: {
+      username: req.cookie.username,
+      privilege,
+      role
+    }
+  })
 });
 
 // 404

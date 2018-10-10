@@ -40,6 +40,47 @@ class Query {
         });
     });
   }
+
+  // 查询用户权限
+  privilege(username) {
+    return new Promise((resolve) => {
+      this.connection.query(
+        `SELECT distinct privilege_id FROM 
+         (
+           SELECT \`user\`.\`id\`,\`user\`.\`username\`,\`user_has_role\`.\`role_id\`
+           FROM user,user_has_role 
+           WHERE \`username\` = '${username}' AND \`user\`.\`id\` = \`user_has_role\`.\`user_id\`
+         ) as A, role_has_privilege 
+           WHERE A.\`role_id\` = \`role_has_privilege\`.\`role_id\`
+        `,
+        function (results) {
+          resolve(results.map((packet) => {
+            return packet.privilege_id;
+          }));
+        });
+    });
+  }
+
+  // 查询用户角色
+  role(username) {
+    return new Promise((resolve) => {
+      this.connection.query(
+        `
+        SELECT \`role\`.\`name\` FROM
+          ( 
+            SELECT \`user_has_role\`.\`role_id\`
+            FROM user,user_has_role
+            WHERE \`username\` = '${username}' AND \`user\`.\`id\` = \`user_has_role\`.\`user_id\`
+          ) AS f, role
+          WHERE \`f\`.\`role_id\` = \`role\`.\`id\`
+        `,
+        function (results) {
+          resolve(results.map((packet) => {
+            return packet.name;
+          }));
+        });
+    });
+  }
 }
 
 module.exports = Query;

@@ -11,7 +11,7 @@
       padding: 0;
     }
 
-    .store,.mycom {
+    .comp-container {
       display: flex;
       border: 1px solid #000;
       margin: 5px 0;
@@ -38,28 +38,32 @@
     <label id='role'></label>
   </div>
 
-  <h3>组件市场</h3>
   <div class='store'>
-    <div class='com'>
-      <div class='info'>这是个这是个组件</div>
-      <div>
-        <label>作者:</label>
-        <label>whj</label>
+    <h3>组件市场</h3>
+    <div class='comp-container'>
+      <div class='com'>
+        <div class='info'>这是个这是个组件</div>
+        <div>
+          <label>作者:</label>
+          <label>whj</label>
+        </div>
+        <button id='downloadBtn'>下载</button>
       </div>
-      <button id='downloadBtn'>下载</button>
     </div>
   </div>
 
-  <h3>我的组件</h3>
   <div class='mycom'>
-    <div class='com'>
-      <div class='info'>这是个这是个组件</div>
-      <button>删除</button>
+    <h3>我的组件</h3>
+    <div class='comp-container'>
+      <div class='com'>
+        <div class='info'>这是个这是个组件</div>
+        <button>删除</button>
+      </div>
     </div>
   </div>
 
-  <h3>上传组件</h3>
   <div class='upload'>
+    <h3>上传组件</h3>
     <div>输入组件信息:</div>
     <textarea id='textarea' cols='20' rows='5'></textarea>
     <div>
@@ -68,8 +72,8 @@
     <button id='uploadBtn'>上传</button>
   </div>
 
-  <h3>管理员</h3>
   <div class='admin'>
+    <h3>管理员</h3>
     <ul>
       <li>
         whj
