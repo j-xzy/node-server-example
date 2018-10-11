@@ -88,6 +88,7 @@ oka.post('/register', async (req, res) => {
   });
 });
 
+//基本信息
 oka.get('/info', async (req, res) => {
   if (!req.cookie.username) {
     return res.json({
@@ -107,6 +108,23 @@ oka.get('/info', async (req, res) => {
       role
     }
   })
+});
+
+// 查询所有用户及角色
+oka.get('/alluser', async (req, res) => {
+  if (!req.cookie.username || req.cookie.username !== 'admin') {
+    return res.json({
+      code: 0,
+      msg: '没有权限',
+      data: {}
+    })
+  }
+  const result = await query.allUser();
+  res.json({
+    code: 1,
+    msg: '成功',
+    data: result
+  });
 });
 
 // 404

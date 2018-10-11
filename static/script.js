@@ -1,15 +1,23 @@
-function renderPersonInfo(username, role) {
-  document.getElementById('username').textContent = username;
-  document.getElementById('role').textContent = role;
+const handler = {
+  set: function (obj, prop, value) {
+    obj[prop] = value;
+    if (prop === 'alluser') {
+      renderAdmin(value);
+    }
+  }
 }
 
-function render(privilege) {
+const database = new Proxy({
+  alluser: []
+}, handler)
+
+async function render(privilege) {
   // admin
   if (privilege.includes(0)) {
-    renderAdmin([{
-      role: 'programmer',
-      name: 'whj'
-    }]);
+    const alluser = await fetchAllUser();
+    if (alluser) {
+      database.alluser = alluser;
+    }
   }
 
   // upload mycom
@@ -41,6 +49,23 @@ function render(privilege) {
       ], true
     );
   }
+}
+
+// 请求所有用户及角色
+function fetchAllUser() {
+  return new Promise((resolve) => {
+    fetch('/alluser', {
+      method: 'GET',
+      credentials: 'include'
+    }).then((raw) => {
+      return raw.json();
+    }).then((json) => {
+      if (json.code === 0) {
+        return alert(json.msg);
+      }
+      resolve(json.data);
+    });
+  })
 }
 
 // 渲染组件市场
@@ -133,19 +158,19 @@ function renderAdmin(users) {
       `<h3>管理员</h3>
         <ul>
         ${
-      users.map(({ name, role }) => {
-        return liTemplate(name, role);
+      users.map(({ name, role }, idx) => {
+        return liTemplate(name, role, idx);
       }).join('')
       }
         </ul>
-        <button>确认</button>`
+        <button id='updateRoleBtn'>确认</button>`
     );
   }
 
-  function liTemplate(name, role) {
+  function liTemplate(name, role, idx) {
     return (
       `<li> ${name}
-         <select id='roleSelect'>
+         <select onChange=changeRole('${idx}') id=select_${idx} class='roleSelect'>
            <option ${role === 'visitor' && 'selected'} value='visitor'>游客</option>
            <option ${role === 'pm' && 'selected'} value='pm'>项目经理</option>
            <option ${role === 'programmer' && 'selected'} value='programmer'>程序员</option>
@@ -155,6 +180,16 @@ function renderAdmin(users) {
   }
 }
 
+function changeRole(id) {
+  database.alluser[id].role = document.querySelector(`#select_${id}`).value;
+}
+
+function renderPersonInfo(username, role) {
+  document.getElementById('username').textContent = username;
+  document.getElementById('role').textContent = role;
+}
+
+// 请求基本信息
 fetch('/info', {
   method: 'GET',
   credentials: 'include'

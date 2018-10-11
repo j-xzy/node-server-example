@@ -21,3 +21,15 @@ SELECT `role`.`name` FROM
 )AS f, role
 WHERE `f`.`role_id` = `role`.`id`
 ```
+
+3. 查询所有角色权限(除admin)
+
+``` sql
+SELECT username,name as rolename, role_id FROM
+(
+  SELECT username, role_id FROM `user`
+  LEFT JOIN `user_has_role` 
+  ON `user_has_role`.`user_id` =  `user`.`id`
+  WHERE `user`.`id` != 0 
+) AS foo, role WHERE `foo`.`role_id` = `role`.`id`
+```

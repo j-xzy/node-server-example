@@ -34,7 +34,7 @@ class Query {
   // 验证用户密码
   validate(username, password) {
     return new Promise((resolve) => {
-      this.connection.query(`SELECT COUNT(*) FROM \`node_server_example\`.user WHERE \`username\` = '${username}' AND \`password\` = '${password}'`,
+      this.connection.query(`SELECT COUNT(*) FROM \`node_server_example\`.user WHERE binary \`username\` = '${username}' AND binary \`password\` = '${password}'`,
         function (results) {
           resolve(results[0]['COUNT(*)'] > 0);
         });
@@ -77,6 +77,30 @@ class Query {
         function (results) {
           resolve(results.map((packet) => {
             return packet.name;
+          }));
+        });
+    });
+  }
+
+  // 查询所有用户及角色
+  allUser() {
+    return new Promise((resolve) => {
+      this.connection.query(
+        `
+        SELECT username,name as rolename, role_id FROM
+        (
+          SELECT username, role_id FROM \`user\`
+          LEFT JOIN \`user_has_role\` 
+          ON \`user_has_role\`.\`user_id\` =  \`user\`.\`id\`
+          WHERE \`user\`.\`id\` != 0 
+        ) AS foo, role WHERE \`foo\`.\`role_id\` = \`role\`.\`id\`
+        `,
+        function (results) {
+          resolve(results.map(({ username, rolename }) => {
+            return {
+              name: username,
+              role: rolename
+            }
           }));
         });
     });
