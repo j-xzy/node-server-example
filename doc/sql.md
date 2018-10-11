@@ -33,3 +33,9 @@ SELECT username,name as rolename, role_id FROM
   WHERE `user`.`id` != 0 
 ) AS foo, role WHERE `foo`.`role_id` = `role`.`id`
 ```
+
+4. 更改用户角色
+
+``` sql
+UPDATE `user_has_role` SET `role_id`='3' WHERE `user_id`= (SELECT id FROM `user` WHERE username = 'whj')
+```

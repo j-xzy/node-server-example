@@ -96,12 +96,22 @@ class Query {
         ) AS foo, role WHERE \`foo\`.\`role_id\` = \`role\`.\`id\`
         `,
         function (results) {
-          resolve(results.map(({ username, rolename }) => {
+          resolve(results.map(({ username, role_id }) => {
             return {
               name: username,
-              role: rolename
+              roleId: role_id
             }
           }));
+        });
+    });
+  }
+
+  // 更改用户权限
+  updateRole(username, role) {
+    return new Promise((resolve) => {
+      this.connection.query(`UPDATE \`user_has_role\` SET \`role_id\`='${role}' WHERE \`user_id\`= (SELECT id FROM \`user\` WHERE username = '${username}')`,
+        function (results) {
+          resolve();
         });
     });
   }

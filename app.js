@@ -127,6 +127,27 @@ oka.get('/alluser', async (req, res) => {
   });
 });
 
+// 更改用户权限
+oka.post('/updateRole', async (req, res) => {
+  if (!req.cookie.username || req.cookie.username !== 'admin') {
+    return res.json({
+      code: 0,
+      msg: '没有权限',
+      data: {}
+    })
+  }
+  const promises = [];
+  for (let i = 0; i < req.body.length; i++) {
+    promises.push(query.updateRole(req.body[i].name, req.body[i].roleId));
+  }
+  await Promise.all(promises);
+  res.json({
+    code: 1,
+    msg: '更改成功',
+    data: {}
+  });
+});
+
 // 404
 oka.use((req, res) => {
   if (!req.finished) {

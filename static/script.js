@@ -158,12 +158,12 @@ function renderAdmin(users) {
       `<h3>管理员</h3>
         <ul>
         ${
-      users.map(({ name, role }, idx) => {
-        return liTemplate(name, role, idx);
+      users.map(({ name, roleId }, idx) => {
+        return liTemplate(name, roleId, idx);
       }).join('')
       }
         </ul>
-        <button id='updateRoleBtn'>确认</button>`
+        <button onClick=handleAdminBtnClick()>确认</button>`
     );
   }
 
@@ -171,17 +171,35 @@ function renderAdmin(users) {
     return (
       `<li> ${name}
          <select onChange=changeRole('${idx}') id=select_${idx} class='roleSelect'>
-           <option ${role === 'visitor' && 'selected'} value='visitor'>游客</option>
-           <option ${role === 'pm' && 'selected'} value='pm'>项目经理</option>
-           <option ${role === 'programmer' && 'selected'} value='programmer'>程序员</option>
+           <option ${role === 3 &&  'selected'} value='3'>游客</option>
+           <option ${role === 2 && 'selected'} value='2'>项目经理</option>
+           <option ${role === 1 && 'selected'} value='1'>程序员</option>
          </select>
       </li>`
     );
   }
 }
 
+// 更改database.allUser的role
 function changeRole(id) {
-  database.alluser[id].role = document.querySelector(`#select_${id}`).value;
+  database.alluser[id].roleId = document.querySelector(`#select_${id}`).value;
+}
+
+// 处理admin的click事件，提交role更改
+function handleAdminBtnClick() {
+  fetch('/updateRole', {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify(database.alluser)
+  }).then((res) => {
+    console.log(res)
+    return res.json();
+  }).then((result) => {
+    alert(result.msg);
+  })
 }
 
 function renderPersonInfo(username, role) {
