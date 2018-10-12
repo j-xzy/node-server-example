@@ -4,13 +4,16 @@ const handler = {
     if (prop === 'alluser') {
       renderAdmin(value);
     }
-    if(prop === 'compStore') {
+    if (prop === 'compStore') {
       renderCompStore(value, obj.privilege.includes(2));
     }
-    if(prop === 'username') {
+    if (prop === 'username') {
       renderUsername(value);
     }
-    if(prop === 'role') {
+    if (prop === 'myComp') {
+      renderMyComp(value);
+    }
+    if (prop === 'role') {
       renderRole(value);
     }
   }
@@ -20,13 +23,14 @@ const database = new Proxy({
   alluser: [],
   compStore: [],
   privilege: [],
+  myComp: [],
   username: '',
   role: ''
 }, handler)
 
 async function render() {
   const privilege = database.privilege;
-  if(!privilege) {
+  if (!privilege) {
     return alert('没有权限');
   }
   // admin
@@ -37,17 +41,18 @@ async function render() {
     }
   }
 
-  // upload mycom
-  if (privilege.includes(1)) {
-    renderUploadComp();
-    renderMyComp(['aaa', 'bbb', 'ccc']);
-  }
-
   // store
   if (privilege.includes(3)) {
     database.compStore = await fetchPublicComp();
-  }  
+  }
+
+  // upload mycom
+  if (privilege.includes(1)) {
+    renderUploadComp();
+    database.myComp = await fetchMyComp();
+  }
 }
+
 // 请求所有用户及角色
 function fetchAllUser() {
   return new Promise((resolve) => {
@@ -69,6 +74,23 @@ function fetchAllUser() {
 function fetchPublicComp() {
   return new Promise((resolve) => {
     fetch('/publicComp', {
+      method: 'GET',
+      credentials: 'include'
+    }).then((res) => {
+      return res.json();
+    }).then((json) => {
+      if (json.code === 0) {
+        return alert(json.msg);
+      }
+      resolve(json.data);
+    });
+  });
+}
+
+// 请求我的组件
+function fetchMyComp() {
+  return new Promise((resolve) => {
+    fetch('/myComp', {
       method: 'GET',
       credentials: 'include'
     }).then((res) => {
@@ -155,9 +177,9 @@ function renderUploadComp() {
       <div>输入组件信息:</div>
       <textarea id='textarea' cols='20' rows='5'></textarea>
       <div>
-        公开<input type='checkbox' />
+        公开<input type='checkbox' checked id='ispublic'/>
       </div>
-      <button id='uploadBtn'>上传</button>`
+      <button onClick=handleUploadClick() id='uploadBtn'>上传</button>`
     );
   }
 }
@@ -185,7 +207,7 @@ function renderAdmin(users) {
     return (
       `<li> ${name}
          <select onChange=changeRole('${idx}') id=select_${idx} class='roleSelect'>
-           <option ${role === 3 &&  'selected'} value='3'>游客</option>
+           <option ${role === 3 && 'selected'} value='3'>游客</option>
            <option ${role === 2 && 'selected'} value='2'>项目经理</option>
            <option ${role === 1 && 'selected'} value='1'>程序员</option>
          </select>
@@ -209,9 +231,39 @@ function handleAdminBtnClick() {
     },
     body: JSON.stringify(database.alluser)
   }).then((res) => {
-    console.log(res)
     return res.json();
   }).then((result) => {
+    alert(result.msg);
+  })
+}
+
+// 处理上传组件逻辑
+function handleUploadClick() {
+  const comp = document.querySelector('#textarea').value;
+  const status = document.querySelector('#ispublic').checked ? 1 : 2;
+  fetch('/uploadComp', {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      comp,
+      status
+    })
+  }).then((res) => {
+    return res.json();
+  }).then((result) => {
+    if (result.code !== 1) {
+      return alert(result.msg);
+    }
+    if (status === 1) {
+      database.compStore = [...database.compStore, {
+        comp,
+        auther: database.username
+      }]
+    }
+    database.myComp = [...database.myComp, comp];
     alert(result.msg);
   })
 }
@@ -236,7 +288,7 @@ fetch('/info', {
   }
   const data = json.data;
   database.username = data.username;
-  database.role =  data.role.join(',');
+  database.role = data.role.join(',');
   database.privilege = data.privilege;
   render();
 });

@@ -150,7 +150,12 @@ oka.post('/updateRole', async (req, res) => {
 
 // 上传组件
 oka.post('/uploadComp', async (req, res) => {
-
+  await query.addComp(req.cookie.username, req.body.comp, req.body.status);
+  res.json({
+    code: 1,
+    msg: '上传成功',
+    data: {}
+  });
 });
 
 // 查询公开组件
@@ -161,6 +166,16 @@ oka.get('/publicComp', async (req, res) => {
     msg: '查询成功',
     data: comp
   });
+});
+
+// 查询我的组件
+oka.get('/myComp', async (req, res) => {
+  const comp = await query.comp(req.cookie.username);
+  res.json({
+    code: 1,
+    msg: '查询成功',
+    data: comp
+  })
 });
 
 // 404

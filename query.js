@@ -117,9 +117,9 @@ class Query {
   }
 
   //　新增组件
-  addComp(authorId, content, status) {
+  addComp(username, content, status) {
     return new Promise((resolve) => {
-      this.connection.query(`INSERT INTO \`comp\` (\`author_id\`,\`content\`, \`status\`) VALUES (${authorId},'${content}', ${status}))`,
+      this.connection.query(`INSERT INTO \`comp\` (\`author_id\`,\`content\`, \`status\`) VALUES ((SELECT id FROM user WHERE username = '${username}'),'${content}', ${status});`,
         function () {
           resolve();
         });
@@ -131,11 +131,23 @@ class Query {
     return new Promise((resolve) => {
       this.connection.query(`SELECT username, content FROM comp LEFT JOIN user ON comp.author_id = user.id WHERE comp.status = 1`,
         function (results) {
-          resolve(results.map(({username, content}) => {
+          resolve(results.map(({ username, content }) => {
             return {
               comp: content,
               auther: username
             }
+          }));
+        });
+    });
+  }
+
+  // 查询组件
+  comp(username) {
+    return new Promise((resolve) => {
+      this.connection.query(`SELECT content FROM comp WHERE author_id = (SELECT id FROM user WHERE username = '${username}')`,
+        function (results) {
+          resolve(results.map(({ content }) => {
+            return content;
           }));
         });
     });
