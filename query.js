@@ -110,8 +110,33 @@ class Query {
   updateRole(username, role) {
     return new Promise((resolve) => {
       this.connection.query(`UPDATE \`user_has_role\` SET \`role_id\`='${role}' WHERE \`user_id\`= (SELECT id FROM \`user\` WHERE username = '${username}')`,
-        function (results) {
+        function () {
           resolve();
+        });
+    });
+  }
+
+  //　新增组件
+  addComp(authorId, content, status) {
+    return new Promise((resolve) => {
+      this.connection.query(`INSERT INTO \`comp\` (\`author_id\`,\`content\`, \`status\`) VALUES (${authorId},'${content}', ${status}))`,
+        function () {
+          resolve();
+        });
+    });
+  }
+
+  // 查询公开组件
+  publicComp() {
+    return new Promise((resolve) => {
+      this.connection.query(`SELECT username, content FROM comp LEFT JOIN user ON comp.author_id = user.id WHERE comp.status = 1`,
+        function (results) {
+          resolve(results.map(({username, content}) => {
+            return {
+              comp: content,
+              auther: username
+            }
+          }));
         });
     });
   }

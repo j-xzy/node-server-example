@@ -4,14 +4,31 @@ const handler = {
     if (prop === 'alluser') {
       renderAdmin(value);
     }
+    if(prop === 'compStore') {
+      renderCompStore(value, obj.privilege.includes(2));
+    }
+    if(prop === 'username') {
+      renderUsername(value);
+    }
+    if(prop === 'role') {
+      renderRole(value);
+    }
   }
 }
 
 const database = new Proxy({
-  alluser: []
+  alluser: [],
+  compStore: [],
+  privilege: [],
+  username: '',
+  role: ''
 }, handler)
 
-async function render(privilege) {
+async function render() {
+  const privilege = database.privilege;
+  if(!privilege) {
+    return alert('没有权限');
+  }
   // admin
   if (privilege.includes(0)) {
     const alluser = await fetchAllUser();
@@ -26,31 +43,11 @@ async function render(privilege) {
     renderMyComp(['aaa', 'bbb', 'ccc']);
   }
 
-  // store 不能下载
-  if (privilege.includes(2) && !privilege.includes(3)) {
-    renderCompStore(
-      [
-        {
-          comp: 'xxx',
-          auther: 'whj'
-        }
-      ], false
-    );
-  }
-
-  // store 可以下载
-  if (privilege.includes(2) && privilege.includes(3)) {
-    renderCompStore(
-      [
-        {
-          comp: 'xxx',
-          auther: 'whj'
-        }
-      ], true
-    );
-  }
+  // store
+  if (privilege.includes(3)) {
+    database.compStore = await fetchPublicComp();
+  }  
 }
-
 // 请求所有用户及角色
 function fetchAllUser() {
   return new Promise((resolve) => {
@@ -59,6 +56,23 @@ function fetchAllUser() {
       credentials: 'include'
     }).then((raw) => {
       return raw.json();
+    }).then((json) => {
+      if (json.code === 0) {
+        return alert(json.msg);
+      }
+      resolve(json.data);
+    });
+  })
+}
+
+// 请求公开组件
+function fetchPublicComp() {
+  return new Promise((resolve) => {
+    fetch('/publicComp', {
+      method: 'GET',
+      credentials: 'include'
+    }).then((res) => {
+      return res.json();
     }).then((json) => {
       if (json.code === 0) {
         return alert(json.msg);
@@ -80,7 +94,7 @@ function renderCompStore(comps, isDownload) {
       <div class='comp-container'>
         ${
       comps.map(({ comp, auther }) => {
-        return compTemplate(isDownload, auther, comp);
+        return compTemplate(auther, comp);
       }).join('')
       }
       </div>
@@ -88,7 +102,7 @@ function renderCompStore(comps, isDownload) {
     )
   }
 
-  function compTemplate(isDownload, author, comp) {
+  function compTemplate(author, comp) {
     return (
       `<div class='com'>
        <div class='info'>${comp}</div>
@@ -202,8 +216,11 @@ function handleAdminBtnClick() {
   })
 }
 
-function renderPersonInfo(username, role) {
+function renderUsername(username) {
   document.getElementById('username').textContent = username;
+}
+
+function renderRole(role) {
   document.getElementById('role').textContent = role;
 }
 
@@ -218,8 +235,10 @@ fetch('/info', {
     return alert(json.msg);
   }
   const data = json.data;
-  renderPersonInfo(data.username, data.role.join(''));
-  render(data.privilege);
+  database.username = data.username;
+  database.role =  data.role.join(',');
+  database.privilege = data.privilege;
+  render();
 });
 
 function getCookie(key) {

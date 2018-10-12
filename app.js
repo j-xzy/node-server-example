@@ -148,6 +148,21 @@ oka.post('/updateRole', async (req, res) => {
   });
 });
 
+// 上传组件
+oka.post('/uploadComp', async (req, res) => {
+
+});
+
+// 查询公开组件
+oka.get('/publicComp', async (req, res) => {
+  const comp = await query.publicComp();
+  res.json({
+    code: 1,
+    msg: '查询成功',
+    data: comp
+  });
+});
+
 // 404
 oka.use((req, res) => {
   if (!req.finished) {

@@ -39,3 +39,15 @@ SELECT username,name as rolename, role_id FROM
 ``` sql
 UPDATE `user_has_role` SET `role_id`='3' WHERE `user_id`= (SELECT id FROM `user` WHERE username = 'whj')
 ```
+
+5. 新增组件
+
+``` sql
+INSERT INTO `comp` (`author_id`,`content`, `status`) VALUES ('1','xxxx', '1');
+```
+
+6. 查询公开组件
+
+``` sql
+SELECT username, content FROM comp LEFT JOIN user ON comp.author_id = user.id WHERE comp.status = 1
+```
