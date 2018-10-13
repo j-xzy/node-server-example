@@ -119,9 +119,11 @@ class Query {
   //　新增组件
   addComp(username, content, status) {
     return new Promise((resolve) => {
-      this.connection.query(`INSERT INTO \`comp\` (\`author_id\`,\`content\`, \`status\`) VALUES ((SELECT id FROM user WHERE username = '${username}'),'${content}', ${status});`,
-        function () {
-          resolve();
+      this.connection.query(`INSERT INTO \`comp\` (\`user_id\`,\`content\`, \`status\`) VALUES ((SELECT id FROM user WHERE username = '${username}'),'${content}', ${status});`,
+        () => {
+          this.connection.query('SELECT LAST_INSERT_ID() as lastID', (results) => {
+            resolve(results[0].lastID);
+          })
         });
     });
   }
@@ -129,12 +131,13 @@ class Query {
   // 查询公开组件
   publicComp() {
     return new Promise((resolve) => {
-      this.connection.query(`SELECT username, content FROM comp LEFT JOIN user ON comp.author_id = user.id WHERE comp.status = 1`,
+      this.connection.query(`SELECT username, content, comp.id FROM comp LEFT JOIN user ON comp.user_id = user.id WHERE comp.status = 1`,
         function (results) {
-          resolve(results.map(({ username, content }) => {
+          resolve(results.map(({ username, content, id }) => {
             return {
               comp: content,
-              auther: username
+              auther: username,
+              id
             }
           }));
         });
@@ -142,13 +145,36 @@ class Query {
   }
 
   // 查询组件
-  comp(username) {
+  compByUsername(username) {
     return new Promise((resolve) => {
-      this.connection.query(`SELECT content FROM comp WHERE author_id = (SELECT id FROM user WHERE username = '${username}')`,
+      this.connection.query(`SELECT content, id FROM comp WHERE user_id = (SELECT id FROM user WHERE username = '${username}') AND status != 0`,
         function (results) {
-          resolve(results.map(({ content }) => {
-            return content;
+          resolve(results.map(({ content, id }) => {
+            return {
+              content,
+              id
+            };
           }));
+        });
+    });
+  }
+
+  // 删除组件
+  deleteComp(compId) {
+    return new Promise((resolve) => {
+      this.connection.query(`UPDATE comp SET status=0 WHERE id=${compId}`,
+        function () {
+          resolve();
+        });
+    });
+  }
+
+  // 查询组件
+  compById(id) {
+    return new Promise((resolve) => {
+      this.connection.query(`SELECT content FROM comp WHERE id = ${id}`,
+        function (results) {
+          resolve(results[0].content);
         });
     });
   }

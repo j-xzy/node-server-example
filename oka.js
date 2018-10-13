@@ -6,11 +6,23 @@ class Oka {
   }
 
   firstMiddleware(req, res, next) {
+    req.originUrl = req.url;
+
     // 挂载重定向
     res.redirect = (url) => {
       res.statusCode = '302';
       res.setHeader('Location', url);
       res.end();
+    }
+    // 解析参数
+    const splits = req.url.split('/');
+    const last = splits[splits.length - 1];
+    if (last.includes('?')) {
+      req.originUrl = '/' + last.split('?')[0];
+      req.params = {};
+      last.split('?')[1].split('&').forEach((str) => {
+        req.params[str.split('=')[0]] = str.split('=')[1];
+      });
     }
 
     // 发送json
@@ -66,13 +78,13 @@ class Oka {
           url.lastIndexOf('/*') !== -1
           && url.lastIndexOf('/*') === url.length - 2
         ) {
-          if (req.url.indexOf(url.slice(0, url.lastIndexOf('/*'))) === 0) {
+          if (req.originUrl.indexOf(url.slice(0, url.lastIndexOf('/*'))) === 0) {
             return middleware(req, res, next);
           }
           return next();
         }
 
-        if (url === req.url) {
+        if (url === req.originUrl) {
           return middleware(req, res, next);
         } else {
           return next();

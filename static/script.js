@@ -115,8 +115,8 @@ function renderCompStore(comps, isDownload) {
       <h3>组件市场</h3>
       <div class='comp-container'>
         ${
-      comps.map(({ comp, auther }) => {
-        return compTemplate(auther, comp);
+      comps.map(({ comp, auther, id }) => {
+        return compTemplate(auther, comp, id);
       }).join('')
       }
       </div>
@@ -124,7 +124,7 @@ function renderCompStore(comps, isDownload) {
     )
   }
 
-  function compTemplate(author, comp) {
+  function compTemplate(author, comp, id) {
     return (
       `<div class='com'>
        <div class='info'>${comp}</div>
@@ -132,7 +132,7 @@ function renderCompStore(comps, isDownload) {
           <label>作者:</label>
           <label>${author}</label>
         </div>
-       ${isDownload ? "<button id='downloadBtn'>下载</button>" : ''}
+       ${isDownload ? `<button onClick=handleDownloadBtnClick(${id})>下载</button>` : ''}
       </div>`
     );
   }
@@ -148,19 +148,19 @@ function renderMyComp(comps) {
       `<h3>我的组件</h3>
        <div class='comp-container'>
          ${
-      comps.map((comp) => {
-        return myCompTemplate(comp);
+      comps.map(({ content, id }) => {
+        return myCompTemplate(content, id);
       }).join('')
       }
        </div>`
     );
   }
 
-  function myCompTemplate(comp) {
+  function myCompTemplate(comp, id) {
     return (
       `<div class='com'>
          <div class='info'>${comp}</div>
-         <button>删除</button>
+         <button onClick=handleDeleteBtn(${id})>删除</button>
        </div>`
     );
   }
@@ -221,6 +221,41 @@ function changeRole(id) {
   database.alluser[id].roleId = document.querySelector(`#select_${id}`).value;
 }
 
+// 处理删除组件按钮事件
+function handleDeleteBtn(compId) {
+  fetch('/deleteComp', {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'content-type': 'application/json'
+    },
+    body: compId
+  }).then((res) => {
+    return res.json();
+  }).then((result) => {
+    alert(result.msg);
+    if (result.code === 1) {
+      database.myComp = database.myComp.filter(({ id }) => {
+        return id != compId;
+      });
+      database.compStore = database.compStore.filter(({ id }) => {
+        return id != compId;
+      });
+    }
+  })
+}
+
+function handleDownloadBtnClick(compId) {
+  const a = document.createElement('a');
+  a.href = `/download?id=${compId}`;
+  a.id = 'downloada'
+  a.download = 'file.text';
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
 // 处理admin的click事件，提交role更改
 function handleAdminBtnClick() {
   fetch('/updateRole', {
@@ -257,13 +292,15 @@ function handleUploadClick() {
     if (result.code !== 1) {
       return alert(result.msg);
     }
+    const id = result.data.compId;
     if (status === 1) {
       database.compStore = [...database.compStore, {
         comp,
+        id,
         auther: database.username
       }]
     }
-    database.myComp = [...database.myComp, comp];
+    database.myComp = [...database.myComp, { content: comp, id }];
     alert(result.msg);
   })
 }
