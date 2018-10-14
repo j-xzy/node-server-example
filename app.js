@@ -1,4 +1,4 @@
-const mysql = require('tiny-sql');
+const mysql = require('./mysql');
 const fs = require('fs');
 const config = require('./config');
 const Oka = require('./oka');
