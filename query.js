@@ -64,6 +64,7 @@ class Query {
   // 查询用户角色
   role(username) {
     return new Promise((resolve) => {
+      let a = "         SELECT `role`.`name` FROM           (              SELECT `user_has_role`.`role_id`             FROM user,user_has_role             WHERE `username` = 'whj' AND `user`.`id` = `user_has_role`.`user_id`           ) AS f, role           WHERE `f`.`role_id` = `role`.`id`         ";
       this.connection.query(
         `
         SELECT \`role\`.\`name\` FROM
