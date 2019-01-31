@@ -105,7 +105,6 @@ class Oka {
         }
         middlewares[i](req, res, dispath.bind(null, i + 1));
       }
-
     }
   }
 
